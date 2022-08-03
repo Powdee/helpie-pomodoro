@@ -48,10 +48,10 @@
 
     if (permissionGranted) sendNotification('You are done! Time for a break');
 
-    reset_counting();
+    start_new_session();
   }
 
-  const start_counting = async () => {
+  const start_session = async () => {
     count_interval = setInterval(update_count, 1000);
     pause = false;
 
@@ -75,7 +75,7 @@
     });
   };
 
-  const stop_counting = () => {
+  const stop_session = () => {
     pause = true;
     clearInterval(count_interval);
     stopped_time = start_time;
@@ -89,7 +89,7 @@
     });
   };
 
-  const reset_counting = () => {
+  const create_new_session = () => {
     current_id = null;
     clearInterval(count_interval);
     start_time_minutes = START_TIME_DEFAULT_MINUTES;
@@ -97,14 +97,20 @@
     start_time = start_time_minutes * 60 + start_time_seconds;
   };
 
-  const remove_count_session = (id: number) => {
+  const remove_session = (id: number) => {
     $store_pomodoro.delete(id);
     $store_pomodoro = $store_pomodoro;
 
     if (id === current_id) {
-      reset_counting();
+      create_new_session();
       pause = true;
     }
+  };
+
+  const remove_all_sessions = () => {
+    $store_pomodoro.clear();
+    $store_pomodoro = $store_pomodoro;
+    create_new_session();
   };
 </script>
 
@@ -126,13 +132,16 @@
   bind:value={start_time_seconds}
 />
 
-<button on:click={start_counting} disabled={start_time === 0 || !pause}>
-  Start
+<button on:click={start_session} disabled={start_time === 0 || !pause}>
+  Start Session
 </button>
-<button on:click={stop_counting} disabled={start_time === 0 || pause}>
-  Stop
+<button on:click={stop_session} disabled={start_time === 0 || pause}>
+  Stop Session
 </button>
-<button on:click={reset_counting} disabled={!pause}> Reset </button>
+<button on:click={create_new_session} disabled={!pause}>
+  Create New Session
+</button>
+<button on:click={remove_all_sessions} disabled={!pause}> Clear All </button>
 
 <h2>{convert_seconds_to_hhmmss(start_time)}</h2>
 
@@ -140,7 +149,7 @@
   {#each [...$store_pomodoro] as [id, data]}
     <li>
       {convert_date_to_full_readable_date(data.created)}
-      <button on:click={() => remove_count_session(id)}>Delete</button>
+      <button on:click={() => remove_session(id)}>Delete</button>
       <ul class="started">
         {#each data.started as started}
           <li><span>{convert_seconds_to_hhmmss(started)},</span></li>
