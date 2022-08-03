@@ -31,6 +31,8 @@
     });
 
     if (permissionGranted) sendNotification('You are done! Time for a break');
+
+    reset_counting();
   }
 
   const start_counting = () => {
@@ -77,6 +79,16 @@
     start_time = 10;
   };
 
+  const remove_count_session = (id: number) => {
+    $store_pomodoro.delete(id);
+    $store_pomodoro = $store_pomodoro;
+
+    if (id === current_id) {
+      reset_counting();
+      pause = true;
+    }
+  };
+
   const convert_seconds_to_hhmmss = (seconds: number) =>
     new Date(seconds * 1000).toISOString().slice(11, 19);
 </script>
@@ -92,11 +104,12 @@
 <h2>{convert_seconds_to_hhmmss(start_time)}</h2>
 
 <ul>
-  {#each [...$store_pomodoro] as [_, data]}
+  {#each [...$store_pomodoro] as [id, data]}
     <li>
       {new Date(data.created).getDate()}.{new Date(
         data.created
       ).getMonth()}.{new Date(data.created).getFullYear()}
+      <button on:click={() => remove_count_session(id)}>Delete</button>
       <ul class="started">
         {#each data.started as started}
           <li><span>{convert_seconds_to_hhmmss(started)},</span></li>
