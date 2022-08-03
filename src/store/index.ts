@@ -1,3 +1,3 @@
-import store_pomodoro_set from './pomodoro';
+import store_pomodoro from './pomodoro';
 
-export { store_pomodoro_set }
+export { store_pomodoro }

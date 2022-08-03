@@ -7,7 +7,7 @@
     "distDir": "../public"
   },
   "package": {
-    "productName": "pomodoro_desktop",
+    "productName": "helpie-pomodoro",
     "version": "0.1.0"
   },
   "tauri": {
