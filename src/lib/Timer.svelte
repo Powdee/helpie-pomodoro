@@ -22,7 +22,10 @@
   let pause = true;
 
   const update_count = () => {
-    start_time = start_time - 1;
+    start_time -= 1;
+
+    if (start_time == 60 && permissionGranted)
+      sendNotification('Hang up! Almost there. 1 minute remaining');
   };
 
   let count_interval = null;
@@ -48,7 +51,7 @@
     reset_counting();
   }
 
-  const start_counting = () => {
+  const start_counting = async () => {
     count_interval = setInterval(update_count, 1000);
     pause = false;
 
@@ -67,7 +70,7 @@
     }
 
     const invoked_obj = $store_pomodoro.get(current_id);
-    invoke('gather_history_data', {
+    await invoke('gather_history_data', {
       state: JSON.stringify(invoked_obj)
     });
   };
@@ -110,7 +113,7 @@
   id="minutes"
   maxlength={2}
   max={59}
-  min={0}
+  min={1}
   bind:value={start_time_minutes}
 />
 

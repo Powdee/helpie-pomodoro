@@ -14,22 +14,20 @@ struct PomodoroData {
 }
 
 fn deserialize_json(state: &String) -> Result<()> {
-    let p: PomodoroData = serde_json::from_str(&state)?;
+    let data: PomodoroData = serde_json::from_str(&state)?;
 
-    println!("First round was created at {}", p.created);
-    println!("First round was started at {}", p.started[0]);
+    println!("First round was created at {}", data.created);
+    println!("First round was started at {}", data.started[0]);
 
     return Ok(());
 }
 
 #[tauri::command]
-fn gather_history_data(state: String) -> String {
+fn gather_history_data(state: String) -> () {
     match deserialize_json(&state) {
         Err(e) => println!("{:?}", e),
         _ => println!("Success"),
     }
-
-    return format!("Created smth special");
 }
 
 fn main() {
