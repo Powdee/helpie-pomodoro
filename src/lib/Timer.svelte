@@ -1,13 +1,23 @@
 <script lang="ts">
   import { invoke } from '@tauri-apps/api/tauri';
   import { sendNotification } from '@tauri-apps/api/notification';
-  import { store_pomodoro } from '../../src/store';
+  import { store_pomodoro } from '../core/store';
+  import {
+    convert_seconds_to_hhmmss,
+    convert_date_to_full_readable_date
+  } from '../core/general/date';
 
   export let permissionGranted: boolean;
 
   let current_id: number = 0;
 
-  let start_time = 10;
+  const START_TIME_DEFAULT_MINUTES = 25;
+  const START_TIME_DEFAULT_SECONDS = 0;
+
+  let start_time_minutes = START_TIME_DEFAULT_MINUTES;
+  let start_time_seconds = START_TIME_DEFAULT_SECONDS;
+
+  $: start_time = start_time_minutes * 60 + start_time_seconds;
   let stopped_time = null;
   let pause = true;
 
@@ -17,6 +27,9 @@
 
   let count_interval = null;
 
+  // once start time is over we need to clear interval and pause the counting.
+  // store neccessary data, reset counting and send notification
+  // once we are done
   $: if (start_time === 0) {
     clearInterval(count_interval);
     pause = true;
@@ -76,7 +89,9 @@
   const reset_counting = () => {
     current_id = null;
     clearInterval(count_interval);
-    start_time = 10;
+    start_time_minutes = START_TIME_DEFAULT_MINUTES;
+    start_time_seconds = START_TIME_DEFAULT_SECONDS;
+    start_time = start_time_minutes * 60 + start_time_seconds;
   };
 
   const remove_count_session = (id: number) => {
@@ -88,10 +103,25 @@
       pause = true;
     }
   };
-
-  const convert_seconds_to_hhmmss = (seconds: number) =>
-    new Date(seconds * 1000).toISOString().slice(11, 19);
 </script>
+
+<input
+  type="number"
+  id="minutes"
+  maxlength={2}
+  max={59}
+  min={0}
+  bind:value={start_time_minutes}
+/>
+
+<input
+  type="number"
+  id="seconds"
+  maxlength={2}
+  max={59}
+  min={0}
+  bind:value={start_time_seconds}
+/>
 
 <button on:click={start_counting} disabled={start_time === 0 || !pause}>
   Start
@@ -106,9 +136,7 @@
 <ul>
   {#each [...$store_pomodoro] as [id, data]}
     <li>
-      {new Date(data.created).getDate()}.{new Date(
-        data.created
-      ).getMonth()}.{new Date(data.created).getFullYear()}
+      {convert_date_to_full_readable_date(data.created)}
       <button on:click={() => remove_count_session(id)}>Delete</button>
       <ul class="started">
         {#each data.started as started}
