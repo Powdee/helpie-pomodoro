@@ -48,7 +48,7 @@
 
     if (permissionGranted) sendNotification('You are done! Time for a break');
 
-    start_new_session();
+    create_new_session();
   }
 
   const start_session = async () => {
@@ -75,7 +75,7 @@
     });
   };
 
-  const stop_session = () => {
+  const pause_session = () => {
     pause = true;
     clearInterval(count_interval);
     stopped_time = start_time;
@@ -92,9 +92,6 @@
   const create_new_session = () => {
     current_id = null;
     clearInterval(count_interval);
-    start_time_minutes = START_TIME_DEFAULT_MINUTES;
-    start_time_seconds = START_TIME_DEFAULT_SECONDS;
-    start_time = start_time_minutes * 60 + start_time_seconds;
   };
 
   const remove_session = (id: number) => {
@@ -135,13 +132,15 @@
 <button on:click={start_session} disabled={start_time === 0 || !pause}>
   Start Session
 </button>
-<button on:click={stop_session} disabled={start_time === 0 || pause}>
-  Stop Session
+<button on:click={pause_session} disabled={start_time === 0 || pause}>
+  Pause Session
 </button>
-<button on:click={create_new_session} disabled={!pause}>
-  Create New Session
-</button>
-<button on:click={remove_all_sessions} disabled={!pause}> Clear All </button>
+{#if $store_pomodoro.size > 0}
+  <button on:click={create_new_session} disabled={!pause}>
+    Create New Session
+  </button>
+  <button on:click={remove_all_sessions} disabled={!pause}> Clear All </button>
+{/if}
 
 <h2>{convert_seconds_to_hhmmss(start_time)}</h2>
 
