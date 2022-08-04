@@ -1,8 +1,8 @@
 # TODO
 
-- [ ] **"create new session"** button should be disabled when no session is initialized
-- [ ] **"clear all"** button should be disabled when no session is initialized
-- [ ] create **take a break** functionality
+- [X] **"create new session"** button should be disabled when no session is initialized
+- [X] **"clear all"** button should be disabled when no session is initialized
+- [ ] create **take a break** sfunctionality
   - [ ] add input for minutes
   - [ ] add input for seconds
   - [ ] connect **take a break** data with pomodoro store data
