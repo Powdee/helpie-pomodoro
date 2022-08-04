@@ -18,7 +18,7 @@
   let start_time_seconds = START_TIME_DEFAULT_SECONDS;
 
   $: start_time = start_time_minutes * 60 + start_time_seconds;
-  let stopped_time = null;
+  let paused_time = null;
   let pause = true;
 
   const update_count = () => {
@@ -38,11 +38,11 @@
     pause = true;
 
     const current_history_data = $store_pomodoro.get(current_id);
-    const stopped_info = current_history_data.stopped || [];
+    const paused_info = current_history_data.paused || [];
 
     $store_pomodoro = $store_pomodoro.set(current_id, {
       ...current_history_data,
-      stopped: [...stopped_info, 0],
+      paused: [...paused_info, 0],
       finished: new Date()
     });
 
@@ -59,13 +59,13 @@
     if (current_history_data) {
       $store_pomodoro = $store_pomodoro.set(current_id, {
         ...current_history_data,
-        started: [...current_history_data.started, start_time]
+        resumed: [...current_history_data.resumed, start_time]
       });
     } else {
       current_id = Date.now();
       $store_pomodoro = $store_pomodoro.set(current_id, {
         created: new Date(),
-        started: [start_time]
+        resumed: [start_time]
       });
     }
 
@@ -78,14 +78,14 @@
   const pause_session = () => {
     pause = true;
     clearInterval(count_interval);
-    stopped_time = start_time;
+    paused_time = start_time;
 
     const current_history_data = $store_pomodoro.get(current_id);
-    const stopped_info = current_history_data.stopped || [];
+    const paused_info = current_history_data.paused || [];
 
     $store_pomodoro = $store_pomodoro.set(current_id, {
       ...current_history_data,
-      stopped: [...stopped_info, stopped_time]
+      paused: [...paused_info, paused_time]
     });
   };
 
@@ -150,15 +150,15 @@
       {convert_date_to_full_readable_date(data.created)}
       <button on:click={() => remove_session(id)}>Delete</button>
       <ul class="started">
-        {#each data.started as started}
-          <li><span>{convert_seconds_to_hhmmss(started)},</span></li>
+        {#each data.resumed as resumed}
+          <li><span>{convert_seconds_to_hhmmss(resumed)},</span></li>
         {/each}
       </ul>
 
       <ul class="started">
-        {#if data.stopped}
-          {#each data.stopped as stopped}
-            <li>{convert_seconds_to_hhmmss(stopped)},</li>
+        {#if data.paused}
+          {#each data.paused as paused}
+            <li>{convert_seconds_to_hhmmss(paused)},</li>
           {/each}
         {/if}
       </ul>
